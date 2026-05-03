@@ -17,7 +17,7 @@ export default class TestErrorButton extends Component<Record<string, never>, Te
     };
   }
 
-  private errorButtonClickHandler = (): void => {
+  private handleErrorButtonClick = (): void => {
     this.setState({ shouldThrowError: true });
   };
 
@@ -27,7 +27,7 @@ export default class TestErrorButton extends Component<Record<string, never>, Te
     }
 
     return (
-      <Button className={CLASS} onClick={this.errorButtonClickHandler}>
+      <Button className={CLASS} onClick={this.handleErrorButtonClick}>
         🔴 {TEXT_ERROR}
       </Button>
     );
