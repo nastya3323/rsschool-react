@@ -1,0 +1,10 @@
+.results__title {
+  margin-bottom: 20px;
+}
+
+.results__list {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
