@@ -93,7 +93,7 @@ class App extends Component {
   };
 
   public performSearch = async (): Promise<void> => {
-    const { searchQuery, lastExecutedQuery, isLoading } = this.state;
+    const { searchQuery, lastExecutedQuery, isLoading, error, searchResults } = this.state;
 
     if (isLoading) {
       return;
@@ -106,6 +106,10 @@ class App extends Component {
     }
 
     if (trimmed === '') {
+      if (lastExecutedQuery === '' && !error && searchResults.length > 0) {
+        return;
+      }
+
       localStorage.removeItem(STORAGE_KEY);
       this.setState({ lastExecutedQuery: '', error: null });
       await this.loadFirstPage();
