@@ -13,6 +13,10 @@
   flex-direction: column;
 }
 
+.results__title {
+  margin-bottom: 20px;
+}
+
 .test-error-button {
   margin-top: 50px;
   background: #4682b4;

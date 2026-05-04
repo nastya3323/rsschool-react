@@ -1,9 +1,11 @@
 .card-item {
-  max-width: calc((100% - 40px) / 2);
+  min-width: calc((100% - 40px) / 2);
+  max-width: 380px;
   border: 1px solid var(--accent-bg);
   border-radius: 15px;
   padding: 20px;
   font-size: 23px;
+  color: var(--text-h);
 
   @media (max-width: 1024px) {
     font-size: 20px;
@@ -13,9 +15,10 @@
 .card-item__title {
   font-size: 23px;
   margin-bottom: 10px;
+  color: rgba(120, 5, 208);
 
   span {
-    color: #3f8486;
+    color: #0a261c;
   }
 
   @media (max-width: 1024px) {

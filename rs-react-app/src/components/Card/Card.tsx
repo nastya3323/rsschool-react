@@ -1,4 +1,5 @@
 import './Card.css';
+import type { Character } from '../../App';
 import { Component, type JSX } from 'react';
 
 const CLASSES = {
@@ -8,21 +9,29 @@ const CLASSES = {
 };
 
 interface CardProps {
-  name: string;
-  description: string;
+  character: Character;
 }
 
 export default class Card extends Component<CardProps> {
   render(): JSX.Element {
-    const { name, description } = this.props;
+    const { character } = this.props;
 
     return (
       <div className={CLASSES.CARD_ITEM}>
         <h3 className={CLASSES.CARD_ITEM_TITLE}>
-          <span>Name</span>: {name}
+          <span>Name</span>: {character.name}
         </h3>
         <p className={CLASSES.CARD_ITEM_DESCRIPTION}>
-          <span>Description</span>: {description}
+          <span>Status</span>: {character.status}
+        </p>
+        <p className={CLASSES.CARD_ITEM_DESCRIPTION}>
+          <span>Gender</span>: {character.gender}
+        </p>
+        <p className={CLASSES.CARD_ITEM_DESCRIPTION}>
+          <span>Species</span>: {character.species}
+        </p>
+        <p className={CLASSES.CARD_ITEM_DESCRIPTION}>
+          <span>Location</span>: {character.location.name}
         </p>
       </div>
     );
