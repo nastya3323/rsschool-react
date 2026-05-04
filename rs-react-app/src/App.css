@@ -24,7 +24,7 @@
   align-self: end;
 }
 
-.test-error-button:hover {
+.test-error-button:hover:enabled {
   background: #326d9e;
 }
 

@@ -133,7 +133,12 @@ class App extends Component {
         </header>
         <main className={CLASSES.MAIN}>
           <section className={CLASSES.SEARCH}>
-            <SearchBar searchQuery={searchQuery} onSearchInput={this.handleSearchInput} onSearch={this.performSearch} />
+            <SearchBar
+              searchQuery={searchQuery}
+              onSearchInput={this.handleSearchInput}
+              onSearch={this.performSearch}
+              isLoading={isLoading}
+            />
           </section>
 
           <section className={CLASSES.RESULTS}>
@@ -142,7 +147,7 @@ class App extends Component {
 
               <CardList results={searchResults} error={error} isLoading={isLoading} />
 
-              <TestErrorButton />
+              <TestErrorButton isLoading={isLoading} />
             </ErrorBoundary>
           </section>
         </main>

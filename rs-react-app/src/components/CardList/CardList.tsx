@@ -2,6 +2,7 @@ import './CardList.css';
 import { Component, type JSX } from 'react';
 import Card from '../Card/Card';
 import type { Character } from '../../App';
+import Spinner from '../Spinner/Spinner';
 
 const CLASSES = {
   RESULTS_LIST: 'results__list',
@@ -16,10 +17,14 @@ interface CardListProps {
 
 export default class CardList extends Component<CardListProps> {
   render(): JSX.Element {
-    const { results, error } = this.props;
+    const { results, error, isLoading } = this.props;
 
     if (error) {
       return <div className={CLASSES.ERROR_MESSAGE}>{error}</div>;
+    }
+
+    if (isLoading) {
+      return <Spinner />;
     }
 
     return (

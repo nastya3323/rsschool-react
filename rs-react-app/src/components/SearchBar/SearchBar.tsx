@@ -14,6 +14,7 @@ interface SearchBarProps {
   searchQuery: string;
   onSearchInput: (query: string) => void;
   onSearch: () => void;
+  isLoading: boolean;
 }
 
 export default class SearchBar extends Component<SearchBarProps> {
@@ -32,7 +33,7 @@ export default class SearchBar extends Component<SearchBarProps> {
   };
 
   render(): JSX.Element {
-    const { searchQuery } = this.props;
+    const { searchQuery, isLoading } = this.props;
 
     return (
       <div className={CLASSES.SEARCH_BAR}>
@@ -43,9 +44,10 @@ export default class SearchBar extends Component<SearchBarProps> {
           value={searchQuery}
           onChange={this.handleInputChange}
           onKeyDown={this.handleKeyDown}
+          disabled={isLoading}
         />
-        <Button className={CLASSES.SEARCH_BAR_BUTTON} onClick={this.handleButtonClick}>
-          Find
+        <Button className={CLASSES.SEARCH_BAR_BUTTON} onClick={this.handleButtonClick} disabled={isLoading}>
+          {isLoading ? 'Search...' : 'Find'}
         </Button>
       </div>
     );

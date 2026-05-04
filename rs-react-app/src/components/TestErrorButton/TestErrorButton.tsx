@@ -8,26 +8,28 @@ interface TestErrorButtonState {
   shouldThrowError: boolean;
 }
 
-export default class TestErrorButton extends Component<Record<string, never>, TestErrorButtonState> {
-  constructor(props: Record<string, never>) {
-    super(props);
+interface TestErrorButtonProps {
+  isLoading: boolean;
+}
 
-    this.state = {
-      shouldThrowError: false,
-    };
-  }
+export default class TestErrorButton extends Component<TestErrorButtonProps, TestErrorButtonState> {
+  state = {
+    shouldThrowError: false,
+  };
 
   private handleErrorButtonClick = (): void => {
     this.setState({ shouldThrowError: true });
   };
 
   render(): JSX.Element {
+    const { isLoading } = this.props;
+
     if (this.state.shouldThrowError) {
       throw new Error(TEXT_ERROR);
     }
 
     return (
-      <Button className={CLASS} onClick={this.handleErrorButtonClick}>
+      <Button className={CLASS} onClick={this.handleErrorButtonClick} disabled={isLoading}>
         🔴 {TEXT_ERROR}
       </Button>
     );
