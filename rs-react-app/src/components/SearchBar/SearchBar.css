@@ -22,7 +22,7 @@
   transition: all 0.2s ease-in;
 }
 
-.search-bar__field:hover {
+.search-bar__field:hover:enabled {
   outline: 1px solid var(--accent);
 }
 
@@ -30,7 +30,7 @@
   outline: 1px solid var(--accent-bg);
 }
 
-.search-bar__button:hover {
+.search-bar__button:hover:enabled {
   background: var(--accent);
   color: var(--text-white);
   box-shadow: var(--shadow);

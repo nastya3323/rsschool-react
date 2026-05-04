@@ -13,8 +13,11 @@ const CLASSES = {
   RESULTS_TITLE: 'results__title',
 };
 
+const STORAGE_KEY = 'lastSearchQuery';
+
 export interface AppState {
   searchQuery: string;
+  lastExecutedQuery: string;
   searchResults: [];
   isLoading: boolean;
   error: string | null;
@@ -33,21 +36,28 @@ export interface Character {
 
 class App extends Component {
   state: AppState = {
-    searchQuery: '',
+    searchQuery: localStorage.getItem(STORAGE_KEY) || '',
+    lastExecutedQuery: '',
     searchResults: [],
     isLoading: false,
     error: null,
   };
 
   componentDidMount(): void {
-    this.loadFirstPage();
+    const { searchQuery } = this.state;
+
+    if (searchQuery.trim()) {
+      this.performSearch();
+    } else {
+      this.loadFirstPage();
+    }
   }
 
   public handleSearchInput = (query: string): void => {
-    this.setState({ searchQuery: query });
+    this.setState({ searchQuery: query, error: null });
   };
 
-  private fetchData = async (url: string): Promise<void> => {
+  private fetchData = async (url: string, isSearch: boolean = false): Promise<void> => {
     this.setState({ isLoading: true, error: null });
 
     try {
@@ -67,14 +77,50 @@ class App extends Component {
       }
 
       this.setState({ searchResults: data.results, isLoading: false });
+
+      if (isSearch) {
+        const trimmed = this.state.searchQuery.trim();
+        this.setState({ lastExecutedQuery: trimmed });
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'No characters found';
-      this.setState({ error: errorMessage, isLoading: false, searchResults: [] });
+      this.setState({ lastExecutedQuery: '', error: errorMessage, isLoading: false, searchResults: [] });
     }
   };
 
   private loadFirstPage = async (): Promise<void> => {
     await this.fetchData('https://rickandmortyapi.com/api/character?page=1');
+  };
+
+  public performSearch = async (): Promise<void> => {
+    const { searchQuery, lastExecutedQuery, isLoading } = this.state;
+
+    if (isLoading) {
+      return;
+    }
+
+    const trimmed = searchQuery.trim();
+
+    if (trimmed !== searchQuery) {
+      this.setState({ searchQuery: trimmed });
+    }
+
+    if (trimmed === '') {
+      localStorage.removeItem(STORAGE_KEY);
+      this.setState({ lastExecutedQuery: '', error: null });
+      await this.loadFirstPage();
+      return;
+    }
+
+    if (trimmed === lastExecutedQuery) {
+      return;
+    }
+
+    const url = `https://rickandmortyapi.com/api/character/?name=${trimmed}&page=1`;
+
+    await this.fetchData(url, true);
+
+    localStorage.setItem(STORAGE_KEY, trimmed);
   };
 
   render() {
@@ -87,7 +133,7 @@ class App extends Component {
         </header>
         <main className={CLASSES.MAIN}>
           <section className={CLASSES.SEARCH}>
-            <SearchBar searchQuery={searchQuery} onSearchInput={this.handleSearchInput} />
+            <SearchBar searchQuery={searchQuery} onSearchInput={this.handleSearchInput} onSearch={this.performSearch} />
           </section>
 
           <section className={CLASSES.RESULTS}>
