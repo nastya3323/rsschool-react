@@ -1,11 +1,11 @@
-.search-bar {
+.searchBar {
   display: flex;
   gap: 15px;
   max-width: 500px;
   margin: 0 auto;
 }
 
-.search-bar__field {
+.searchBar__field {
   flex: 1;
   padding: 10px;
   font-size: 16px;
@@ -13,7 +13,7 @@
   border-radius: 6px;
 }
 
-.search-bar__button {
+.searchBar__button {
   padding: 10px 20px;
   font-size: 16px;
   background: var(--accent-bg);
@@ -22,15 +22,15 @@
   transition: all 0.2s ease-in;
 }
 
-.search-bar__field:hover:enabled {
+.searchBar__field:hover:enabled {
   outline: 1px solid var(--accent);
 }
 
-.search-bar__field:focus {
+.searchBar__field:focus {
   outline: 1px solid var(--accent-bg);
 }
 
-.search-bar__button:hover:enabled {
+.searchBar__button:hover:enabled {
   background: var(--accent);
   color: var(--text-white);
   box-shadow: var(--shadow);

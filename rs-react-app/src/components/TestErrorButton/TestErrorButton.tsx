@@ -1,7 +1,7 @@
+import styles from './TestErrorButton.module.css';
 import { Component, type JSX } from 'react';
 import Button from '../Button/Button';
 
-const CLASS = 'test-error-button';
 const TEXT_ERROR = 'Test Error';
 
 interface TestErrorButtonState {
@@ -29,7 +29,7 @@ export default class TestErrorButton extends Component<TestErrorButtonProps, Tes
     }
 
     return (
-      <Button className={CLASS} onClick={this.handleErrorButtonClick} disabled={isLoading}>
+      <Button className={styles.testErrorButton} onClick={this.handleErrorButtonClick} disabled={isLoading}>
         🔴 {TEXT_ERROR}
       </Button>
     );

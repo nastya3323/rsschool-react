@@ -1,13 +1,8 @@
-import './CardList.css';
+import styles from './CardList.module.css';
 import { Component, type JSX } from 'react';
 import Card from '../Card/Card';
 import type { Character } from '../../App';
 import Spinner from '../Spinner/Spinner';
-
-const CLASSES = {
-  RESULTS_LIST: 'results__list',
-  ERROR_MESSAGE: 'error-message',
-};
 
 interface CardListProps {
   results: Character[];
@@ -20,7 +15,7 @@ export default class CardList extends Component<CardListProps> {
     const { results, error, isLoading } = this.props;
 
     if (error) {
-      return <div className={CLASSES.ERROR_MESSAGE}>{error}</div>;
+      return <div className={styles.errorMessage}>{error}</div>;
     }
 
     if (isLoading) {
@@ -29,7 +24,7 @@ export default class CardList extends Component<CardListProps> {
 
     return (
       <>
-        <div className={CLASSES.RESULTS_LIST}>
+        <div className={styles.results__list}>
           {results.map((character) => {
             return <Card key={character.id} character={character} />;
           })}

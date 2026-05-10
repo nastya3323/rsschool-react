@@ -1,16 +1,12 @@
 import { Component } from 'react';
-import './App.css';
+import styles from './App.module.css';
 import CardList from './components/CardList/CardList';
 import SearchBar from './components/SearchBar/SearchBar';
 import TestErrorButton from './components/TestErrorButton/TestErrorButton';
 import ErrorBoundary from './ErrorBoundary';
 
 const CLASSES = {
-  TITLE: 'title',
-  MAIN: 'main',
   SEARCH: 'search',
-  RESULTS: 'results',
-  RESULTS_TITLE: 'results__title',
 };
 
 const STORAGE_KEY = 'lastSearchQuery';
@@ -133,9 +129,9 @@ class App extends Component {
     return (
       <>
         <header>
-          <h1 className={CLASSES.TITLE}>🧪 Rick and Morty character search</h1>
+          <h1 className={styles.title}>🧪 Rick and Morty character search</h1>
         </header>
-        <main className={CLASSES.MAIN}>
+        <main className={styles.main}>
           <section className={CLASSES.SEARCH}>
             <SearchBar
               searchQuery={searchQuery}
@@ -145,9 +141,9 @@ class App extends Component {
             />
           </section>
 
-          <section className={CLASSES.RESULTS}>
+          <section className={styles.results}>
             <ErrorBoundary>
-              <h2 className={CLASSES.RESULTS_TITLE}>Results ({searchResults.length})</h2>
+              <h2 className={styles.results__title}>Results ({searchResults.length})</h2>
 
               <CardList results={searchResults} error={error} isLoading={isLoading} />
 

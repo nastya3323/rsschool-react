@@ -1,14 +1,8 @@
 import Button from '../Button/Button';
-import './SearchBar.css';
+import styles from './SearchBar.module.css';
 import { Component, type ChangeEvent, type JSX, type KeyboardEvent } from 'react';
 
 const PLACEHOLDER__TEXT = 'Enter a character name, for example Rick';
-
-const CLASSES = {
-  SEARCH_BAR: 'search-bar',
-  SEARCH_BAR_FIELD: 'search-bar__field',
-  SEARCH_BAR_BUTTON: 'search-bar__button',
-};
 
 interface SearchBarProps {
   searchQuery: string;
@@ -36,9 +30,9 @@ export default class SearchBar extends Component<SearchBarProps> {
     const { searchQuery, isLoading } = this.props;
 
     return (
-      <div className={CLASSES.SEARCH_BAR}>
+      <div className={styles.searchBar}>
         <input
-          className={CLASSES.SEARCH_BAR_FIELD}
+          className={styles.searchBar__field}
           type="text"
           placeholder={PLACEHOLDER__TEXT}
           value={searchQuery}
@@ -46,7 +40,7 @@ export default class SearchBar extends Component<SearchBarProps> {
           onKeyDown={this.handleKeyDown}
           disabled={isLoading}
         />
-        <Button className={CLASSES.SEARCH_BAR_BUTTON} onClick={this.handleButtonClick} disabled={isLoading}>
+        <Button className={styles.searchBar__button} onClick={this.handleButtonClick} disabled={isLoading}>
           {isLoading ? 'Search...' : 'Find'}
         </Button>
       </div>

@@ -1,12 +1,6 @@
-import './Card.css';
+import styles from './Card.module.css';
 import type { Character } from '../../App';
 import { Component, type JSX } from 'react';
-
-const CLASSES = {
-  CARD_ITEM: 'card-item',
-  CARD_ITEM_TITLE: 'card-item__title',
-  CARD_ITEM_DESCRIPTION: 'card-item__description',
-};
 
 interface CardProps {
   character: Character;
@@ -17,20 +11,20 @@ export default class Card extends Component<CardProps> {
     const { character } = this.props;
 
     return (
-      <div className={CLASSES.CARD_ITEM}>
-        <h3 className={CLASSES.CARD_ITEM_TITLE}>
+      <div className={styles.cardItem}>
+        <h3 className={styles.cardItem__title}>
           <span>Name</span>: {character.name}
         </h3>
-        <p className={CLASSES.CARD_ITEM_DESCRIPTION}>
+        <p className={styles.cardItem__description}>
           <span>Status</span>: {character.status}
         </p>
-        <p className={CLASSES.CARD_ITEM_DESCRIPTION}>
+        <p className={styles.cardItem__description}>
           <span>Gender</span>: {character.gender}
         </p>
-        <p className={CLASSES.CARD_ITEM_DESCRIPTION}>
+        <p className={styles.cardItem__description}>
           <span>Species</span>: {character.species}
         </p>
-        <p className={CLASSES.CARD_ITEM_DESCRIPTION}>
+        <p className={styles.cardItem__description}>
           <span>Location</span>: {character.location.name}
         </p>
       </div>
