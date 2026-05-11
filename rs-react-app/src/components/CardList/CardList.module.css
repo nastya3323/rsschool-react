@@ -1,0 +1,13 @@
+.results__list {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.errorMessage {
+  background: #ffe0e0;
+  color: #b00020;
+  padding: 15px;
+  border-radius: 8px;
+}

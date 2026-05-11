@@ -1,0 +1,10 @@
+.testErrorButton {
+  margin-top: 50px;
+  background: #4682b4;
+  color: var(--text-white);
+  align-self: end;
+}
+
+.testErrorButton:hover:enabled {
+  background: #326d9e;
+}
