@@ -24,7 +24,7 @@ export default class CardList extends Component<CardListProps> {
 
     return (
       <>
-        <div className={styles.results__list}>
+        <div className={styles.results__list} data-testid="card-list">
           {results.map((character) => {
             return <Card key={character.id} character={character} />;
           })}

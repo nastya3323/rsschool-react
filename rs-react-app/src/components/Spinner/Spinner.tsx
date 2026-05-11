@@ -3,6 +3,6 @@ import { Component, type JSX } from 'react';
 
 export default class Spinner extends Component {
   render(): JSX.Element {
-    return <div className={styles.spinner}></div>;
+    return <div className={styles.spinner} data-testid="spinner"></div>;
   }
 }
