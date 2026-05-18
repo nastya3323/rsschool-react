@@ -1,5 +1,5 @@
+import type { Character } from '../../types/types';
 import styles from './Card.module.css';
-import type { Character } from '../../App';
 import { type JSX } from 'react';
 
 interface CardProps {

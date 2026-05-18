@@ -1,7 +1,7 @@
 import styles from './CardList.module.css';
 import { type JSX } from 'react';
 import Card from '../Card/Card';
-import type { Character } from '../../App';
+import type { Character } from '../../types/types';
 import Spinner from '../Spinner/Spinner';
 
 interface CardListProps {
