@@ -11,6 +11,7 @@ import Pagination from '../components/Pagination/Pagination';
 import { useSearchParams } from 'react-router-dom';
 import Spinner from '../components/Spinner/Spinner';
 import CardDetails from '../components/Card/CardDetails';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 const CLASSES = {
   SEARCH: 'search',
@@ -25,7 +26,7 @@ interface DetailsState {
 }
 
 export default function HomePage(): JSX.Element {
-  const [lastSearchQuery, setLastSearchQuery] = useState(() => localStorage.getItem(STORAGE_KEY) || '');
+  const [lastSearchQuery, setLastSearchQuery] = useLocalStorage(STORAGE_KEY, '');
   const [searchQuery, setSearchQuery] = useState(lastSearchQuery);
   const [searchResults, setSearchResults] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -87,7 +88,6 @@ export default function HomePage(): JSX.Element {
       return;
     }
 
-    localStorage.setItem(STORAGE_KEY, trimmed);
     setLastSearchQuery(trimmed);
 
     setSearchParams((prev) => {
@@ -100,7 +100,7 @@ export default function HomePage(): JSX.Element {
 
       return params;
     });
-  }, [lastSearchQuery, searchQuery, setSearchParams]);
+  }, [lastSearchQuery, searchQuery, setSearchParams, setLastSearchQuery]);
 
   const handleSearchInput = (query: string) => {
     setSearchQuery(query);
