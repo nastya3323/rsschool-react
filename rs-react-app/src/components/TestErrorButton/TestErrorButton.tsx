@@ -11,7 +11,8 @@ interface TestErrorButtonProps {
 export default function TestErrorButton({ isLoading }: TestErrorButtonProps): JSX.Element {
   const [shouldThrowError, setShouldThrowError] = useState(false);
 
-  const handleErrorButtonClick = (): void => {
+  const handleErrorButtonClick = (event: React.MouseEvent): void => {
+    event.stopPropagation();
     setShouldThrowError(true);
   };
 

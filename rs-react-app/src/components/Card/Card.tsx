@@ -1,14 +1,20 @@
 import type { Character } from '../../types/types';
 import styles from './Card.module.css';
-import { type JSX } from 'react';
+import React, { type JSX } from 'react';
 
 interface CardProps {
   character: Character;
+  onClick: () => void;
 }
 
-export default function Card({ character }: CardProps): JSX.Element {
+export default function Card({ character, onClick }: CardProps): JSX.Element {
+  const handleClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    onClick();
+  };
+
   return (
-    <div className={styles.cardItem}>
+    <div className={styles.cardItem} onClick={handleClick}>
       <h3 className={styles.cardItem__title}>
         <span>Name</span>: {character.name}
       </h3>
@@ -16,13 +22,7 @@ export default function Card({ character }: CardProps): JSX.Element {
         <span>Status</span>: {character.status}
       </p>
       <p className={styles.cardItem__description}>
-        <span>Gender</span>: {character.gender}
-      </p>
-      <p className={styles.cardItem__description}>
         <span>Species</span>: {character.species}
-      </p>
-      <p className={styles.cardItem__description}>
-        <span>Location</span>: {character.location.name}
       </p>
     </div>
   );

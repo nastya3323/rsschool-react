@@ -8,9 +8,10 @@ interface CardListProps {
   results: Character[];
   error: string | null;
   isLoading: boolean;
+  onCardClick: (id: number) => void;
 }
 
-export default function CardList({ results, error, isLoading }: CardListProps): JSX.Element {
+export default function CardList({ results, error, isLoading, onCardClick }: CardListProps): JSX.Element {
   if (error) {
     return <div className={styles.errorMessage}>{error}</div>;
   }
@@ -23,7 +24,7 @@ export default function CardList({ results, error, isLoading }: CardListProps): 
     <>
       <div className={styles.results__list} data-testid="card-list">
         {results.map((character) => {
-          return <Card key={character.id} character={character} />;
+          return <Card key={character.id} character={character} onClick={() => onCardClick(character.id)} />;
         })}
       </div>
     </>

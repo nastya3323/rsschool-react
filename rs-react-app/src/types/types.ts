@@ -7,6 +7,7 @@ export interface Character {
   location: {
     name: string;
   };
+  image: string;
 }
 
 export interface Info {

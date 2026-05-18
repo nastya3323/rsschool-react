@@ -14,7 +14,9 @@ export default function Pagination({ info }: PaginationProps): JSX.Element {
 
   const { prev, next, pages } = info;
 
-  const handleChangePage = (url: string | null) => {
+  const handleChangePage = (event: React.MouseEvent, url: string | null) => {
+    event.stopPropagation();
+
     if (!url) {
       return;
     }
@@ -32,13 +34,21 @@ export default function Pagination({ info }: PaginationProps): JSX.Element {
 
   return (
     <div className={styles.pagination}>
-      <Button className={styles.pagination__button} onClick={() => handleChangePage(prev)} disabled={!info.prev}>
+      <Button
+        className={styles.pagination__button}
+        onClick={(event) => handleChangePage(event, prev)}
+        disabled={!info.prev}
+      >
         Prev
       </Button>
       <div className={styles.pagination__count}>
         {currentPage} / {pages}
       </div>
-      <Button className={styles.pagination__button} onClick={() => handleChangePage(next)} disabled={!info.next}>
+      <Button
+        className={styles.pagination__button}
+        onClick={(event) => handleChangePage(event, next)}
+        disabled={!info.next}
+      >
         Next
       </Button>
     </div>

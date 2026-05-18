@@ -5,16 +5,24 @@ import ErrorBoundary from '../ErrorBoundary';
 import CardList from '../components/CardList/CardList';
 import TestErrorButton from '../components/TestErrorButton/TestErrorButton';
 import Header from '../components/Header/Header';
-import fetchCharacters from '../api/rickAndMortyApi';
+import { fetchCharacterById, fetchCharacters } from '../api/rickAndMortyApi';
 import type { Character, Info } from '../types/types';
 import Pagination from '../components/Pagination/Pagination';
 import { useSearchParams } from 'react-router-dom';
+import Spinner from '../components/Spinner/Spinner';
+import CardDetails from '../components/Card/CardDetails';
 
 const CLASSES = {
   SEARCH: 'search',
 };
 
 const STORAGE_KEY = 'lastSearchQuery';
+
+interface DetailsState {
+  data: Character | null;
+  isLoading: boolean;
+  error: string | null;
+}
 
 export default function HomePage(): JSX.Element {
   const [lastSearchQuery, setLastSearchQuery] = useState(() => localStorage.getItem(STORAGE_KEY) || '');
@@ -26,6 +34,13 @@ export default function HomePage(): JSX.Element {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
+  const detailsId = searchParams.get('details') ? Number(searchParams.get('details')) : null;
+
+  const [detailsState, setDetailsState] = useState<DetailsState>({
+    data: null,
+    isLoading: false,
+    error: null,
+  });
 
   const fetchData = useCallback(async (searchTerm: string, page: number = 1): Promise<void> => {
     setIsLoading(true);
@@ -41,6 +56,7 @@ export default function HomePage(): JSX.Element {
 
       setError(errorMessage);
       setSearchResults([]);
+      setPaginationInfo({ count: 0, pages: 0, next: null, prev: null });
     } finally {
       setIsLoading(false);
     }
@@ -60,19 +76,6 @@ export default function HomePage(): JSX.Element {
     init();
   }, [lastSearchQuery, fetchData, page]);
 
-  const goToPage = useCallback(
-    (newPage: number) => {
-      if (newPage !== page) {
-        setSearchParams((prev) => {
-          const params = new URLSearchParams(prev);
-          params.set('page', String(newPage));
-          return params;
-        });
-      }
-    },
-    [setSearchParams, page]
-  );
-
   const handleSearch = useCallback(() => {
     const trimmed = searchQuery.trim();
 
@@ -86,11 +89,63 @@ export default function HomePage(): JSX.Element {
 
     localStorage.setItem(STORAGE_KEY, trimmed);
     setLastSearchQuery(trimmed);
-    goToPage(1);
-  }, [lastSearchQuery, searchQuery, goToPage]);
+
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      params.set('page', '1');
+
+      if (params.has('details')) {
+        params.delete('details');
+      }
+
+      return params;
+    });
+  }, [lastSearchQuery, searchQuery, setSearchParams]);
 
   const handleSearchInput = (query: string) => {
     setSearchQuery(query);
+  };
+
+  const loadDetails = useCallback(async (id: number) => {
+    setDetailsState({ data: null, isLoading: true, error: null });
+
+    try {
+      const character = await fetchCharacterById(id);
+
+      setDetailsState({ data: character, isLoading: false, error: null });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load details';
+
+      setDetailsState({ data: null, isLoading: false, error: errorMessage });
+    }
+  }, []);
+
+  useEffect(() => {
+    const init = async () => {
+      if (detailsId) {
+        await loadDetails(detailsId);
+      } else {
+        setDetailsState({ data: null, isLoading: false, error: null });
+      }
+    };
+
+    init();
+  }, [detailsId, loadDetails]);
+
+  const handleCardClick = (id: number) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      params.set('details', String(id));
+      return params;
+    });
+  };
+
+  const closeDetails = () => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      params.delete('details');
+      return params;
+    });
   };
 
   return (
@@ -105,18 +160,29 @@ export default function HomePage(): JSX.Element {
             isLoading={isLoading}
           />
         </section>
+        <ErrorBoundary>
+          <section className={styles.results}>
+            <div className={styles.leftColumn} onClick={closeDetails}>
+              <h2 className={styles.results__title}>Results ({searchResults.length})</h2>
 
-        <section className={styles.results}>
-          <ErrorBoundary>
-            <h2 className={styles.results__title}>Results ({searchResults.length})</h2>
+              <CardList results={searchResults} error={error} isLoading={isLoading} onCardClick={handleCardClick} />
 
-            <CardList results={searchResults} error={error} isLoading={isLoading} />
+              {!isLoading && <Pagination info={paginationInfo} />}
 
-            {!isLoading && <Pagination info={paginationInfo} />}
-
-            <TestErrorButton isLoading={isLoading} />
-          </ErrorBoundary>
-        </section>
+              <TestErrorButton isLoading={isLoading} />
+            </div>
+            <div className={styles.rightColumn}>
+              {detailsState.isLoading && <Spinner />}
+              {detailsState.error && <div className={styles.error}>{detailsState.error}</div>}
+              {detailsState.data && !detailsState.isLoading && (
+                <CardDetails character={detailsState.data} onClose={closeDetails} />
+              )}
+              {!detailsState.data && !detailsState.isLoading && !detailsState.error && (
+                <div className={styles.noDetails}>Click on a character to see details</div>
+              )}
+            </div>
+          </section>
+        </ErrorBoundary>
       </main>
     </>
   );

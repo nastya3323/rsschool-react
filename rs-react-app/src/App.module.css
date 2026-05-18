@@ -10,7 +10,30 @@
 .results {
   padding-top: 80px;
   display: flex;
+}
+
+.leftColumn {
+  flex: 1;
+  display: flex;
   flex-direction: column;
+  padding-right: 16px;
+}
+
+.rightColumn {
+  width: 350px;
+  border-left: 1px solid #ddd;
+  padding-left: 16px;
+}
+
+.error {
+  color: red;
+  padding: 16px;
+}
+
+.noDetails {
+  color: #666;
+  text-align: center;
+  padding: 36px;
 }
 
 .results__title {
@@ -18,6 +41,7 @@
 }
 
 .fallbackUi {
+  padding-top: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
