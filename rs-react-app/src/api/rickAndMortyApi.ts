@@ -1,8 +1,11 @@
-import type { Character } from '../App';
+import type { FetchCharactersResponse } from '../types/types';
 
 const BASE_URL = 'https://rickandmortyapi.com/api/character';
 
-export default async function fetchCharacters(searchTerm: string = '', page: number = 1): Promise<Character[]> {
+export default async function fetchCharacters(
+  searchTerm: string = '',
+  page: number = 1
+): Promise<FetchCharactersResponse> {
   const url = `${BASE_URL}?name=${searchTerm}&page=${page}`;
 
   const response = await fetch(url);
@@ -20,5 +23,5 @@ export default async function fetchCharacters(searchTerm: string = '', page: num
     throw new Error('No characters found');
   }
 
-  return data.results;
+  return { results: data.results, info: data.info };
 }

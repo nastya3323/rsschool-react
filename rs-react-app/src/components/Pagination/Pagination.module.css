@@ -1,0 +1,19 @@
+.pagination {
+  padding-top: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pagination__button {
+  background: var(--accent-bg);
+}
+
+.pagination__button:hover:enabled {
+  background: var(--accent);
+  color: var(--text-white);
+  box-shadow: var(--shadow);
+}
+
+.pagination__count {
+  font-size: 18px;
+}
