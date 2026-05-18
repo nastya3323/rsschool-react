@@ -14,7 +14,7 @@ export default function Card({ character, onClick }: CardProps): JSX.Element {
   };
 
   return (
-    <div className={styles.cardItem} onClick={handleClick}>
+    <div className={styles.cardItem} onClick={handleClick} data-testid="card">
       <h3 className={styles.cardItem__title}>
         <span>Name</span>: {character.name}
       </h3>
