@@ -162,7 +162,7 @@ export default function HomePage(): JSX.Element {
         </section>
         <ErrorBoundary>
           <section className={styles.results}>
-            <div className={styles.leftColumn} onClick={closeDetails}>
+            <div className={styles.leftColumn} onClick={closeDetails} data-testid="left-column">
               <h2 className={styles.results__title}>Results ({searchResults.length})</h2>
 
               <CardList results={searchResults} error={error} isLoading={isLoading} onCardClick={handleCardClick} />
