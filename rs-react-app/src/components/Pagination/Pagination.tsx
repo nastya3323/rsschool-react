@@ -1,18 +1,17 @@
 import styles from './Pagination.module.css';
 import Button from '../Button/Button';
-import type { Info } from '../../types/types';
 import { useSearchParams } from 'react-router-dom';
 import type { JSX } from 'react';
 
 interface PaginationProps {
-  info: Info;
+  prev: string | null;
+  next: string | null;
+  pages: number;
 }
 
-export default function Pagination({ info }: PaginationProps): JSX.Element {
+export default function Pagination({ prev, next, pages }: PaginationProps): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = Number(searchParams.get('page')) || 1;
-
-  const { prev, next, pages } = info;
 
   const handleChangePage = (event: React.MouseEvent, url: string | null) => {
     event.stopPropagation();
@@ -34,21 +33,13 @@ export default function Pagination({ info }: PaginationProps): JSX.Element {
 
   return (
     <div className={styles.pagination}>
-      <Button
-        className={styles.pagination__button}
-        onClick={(event) => handleChangePage(event, prev)}
-        disabled={!info.prev}
-      >
+      <Button className={styles.pagination__button} onClick={(event) => handleChangePage(event, prev)} disabled={!prev}>
         Prev
       </Button>
       <div className={styles.pagination__count}>
         {currentPage} / {pages}
       </div>
-      <Button
-        className={styles.pagination__button}
-        onClick={(event) => handleChangePage(event, next)}
-        disabled={!info.next}
-      >
+      <Button className={styles.pagination__button} onClick={(event) => handleChangePage(event, next)} disabled={!next}>
         Next
       </Button>
     </div>

@@ -122,7 +122,7 @@ export default function HomePage(): JSX.Element {
 
               <CardList results={searchResults} error={error} isLoading={isLoading} onCardClick={handleCardClick} />
 
-              {!isLoading && <Pagination info={paginationInfo} />}
+              {!isLoading && <Pagination {...paginationInfo} />}
 
               <TestErrorButton isLoading={isLoading} />
             </div>
