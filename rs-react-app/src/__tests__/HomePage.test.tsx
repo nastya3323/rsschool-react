@@ -2,13 +2,11 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import * as api from '../api/rickAndMortyApi';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
 import HomePage from '../pages/HomePage';
 
 vi.mock('../api/rickAndMortyApi');
 
 const mockFetchCharacters = api.fetchCharacters as ReturnType<typeof vi.fn>;
-const mockFetchCharacterById = api.fetchCharacterById as ReturnType<typeof vi.fn>;
 
 const mockCharacter = {
   id: 1,
@@ -84,39 +82,6 @@ describe('HomePage', () => {
     await waitFor(() => {
       expect(screen.getByText(/Summer/i)).toBeInTheDocument();
     });
-  });
-
-  it('opens character details when card is clicked', async () => {
-    mockFetchCharacters.mockResolvedValueOnce({ results: [mockCharacter], info: mockInfo });
-    mockFetchCharacterById.mockResolvedValueOnce(mockCharacter);
-
-    renderHomePage();
-    await waitFor(() => expect(screen.getByText(/Rick Sanchez/i)).toBeInTheDocument());
-
-    const card = screen.getByTestId('card');
-    await userEvent.click(card);
-
-    await waitFor(() => {
-      expect(mockFetchCharacterById).toHaveBeenCalledWith(1);
-      expect(screen.getByText('Character Details')).toBeInTheDocument();
-    });
-  });
-
-  it('closes details when clicking on left column', async () => {
-    mockFetchCharacters.mockResolvedValueOnce({ results: [mockCharacter], info: mockInfo });
-    mockFetchCharacterById.mockResolvedValueOnce(mockCharacter);
-
-    renderHomePage();
-    await waitFor(() => expect(screen.getByText(/Rick Sanchez/i)).toBeInTheDocument());
-
-    const card = screen.getByTestId('card');
-    await userEvent.click(card);
-    await waitFor(() => expect(screen.getByText('Character Details')).toBeInTheDocument());
-
-    const leftColumn = screen.getByTestId('left-column');
-    await userEvent.click(leftColumn);
-
-    expect(screen.queryByText('Character Details')).not.toBeInTheDocument();
   });
 
   it('handles pagination when next/prev provided', async () => {
