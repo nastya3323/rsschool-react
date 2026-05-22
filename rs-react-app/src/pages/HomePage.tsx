@@ -11,10 +11,6 @@ import Pagination from '../components/Pagination/Pagination';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import useLocalStorage from '../hooks/useLocalStorage';
 
-const CLASSES = {
-  SEARCH: 'search',
-};
-
 const STORAGE_KEY = 'lastSearchQuery';
 
 export default function HomePage(): JSX.Element {
@@ -111,7 +107,7 @@ export default function HomePage(): JSX.Element {
     <>
       <Header />
       <main className={styles.main}>
-        <section className={CLASSES.SEARCH}>
+        <section>
           <SearchBar
             searchQuery={searchQuery}
             onSearchInput={handleSearchInput}

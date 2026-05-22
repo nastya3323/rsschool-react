@@ -2,10 +2,6 @@ import styles from './App.module.css';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import Button from './components/Button/Button';
 
-const CLASSES = {
-  FALLBACK_UI_TITLE: 'fallback-ui__title',
-};
-
 interface ErrorBoundaryProps {
   children: ReactNode;
 }
@@ -41,7 +37,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
     if (this.state.hasError) {
       return (
         <div className={styles.fallbackUi}>
-          <h2 className={CLASSES.FALLBACK_UI_TITLE}>Fallback UI</h2>
+          <h2>Fallback UI</h2>
           <p className={styles.fallbackUi__description}>
             <span>Message error</span>: {this.state.errorMessage}
           </p>
