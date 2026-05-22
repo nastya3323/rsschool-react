@@ -1,0 +1,29 @@
+.header {
+  display: flex;
+  align-items: center;
+  padding-bottom: 30px;
+  gap: 30px;
+}
+
+.header__title {
+  margin-bottom: 20px;
+  margin-right: auto;
+}
+
+.header__link {
+  text-decoration: none;
+  background: var(--secondary-bg);
+  color: var(--text-white);
+  letter-spacing: 0.4px;
+  font-weight: 500;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+}
+
+.header__link:hover {
+  background: var(--secondary-hover);
+  box-shadow: var(--shadow);
+}

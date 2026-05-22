@@ -1,8 +1,6 @@
 import styles from './Spinner.module.css';
-import { Component, type JSX } from 'react';
+import { type JSX } from 'react';
 
-export default class Spinner extends Component {
-  render(): JSX.Element {
-    return <div className={styles.spinner} data-testid="spinner"></div>;
-  }
+export default function Spinner(): JSX.Element {
+  return <div className={styles.spinner} data-testid="spinner"></div>;
 }

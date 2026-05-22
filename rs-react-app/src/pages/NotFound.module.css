@@ -1,0 +1,32 @@
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.notFound__title {
+  margin-bottom: 15px;
+}
+
+.notFound__description {
+  margin-bottom: 30px;
+}
+
+.notFound__link {
+  text-decoration: none;
+  background: var(--secondary-bg);
+  color: var(--text-white);
+  font-family: var(--sans);
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+}
+
+.notFound__link:hover {
+  background: var(--secondary-hover);
+  box-shadow: var(--shadow);
+}
