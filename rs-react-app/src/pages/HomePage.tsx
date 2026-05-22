@@ -5,12 +5,10 @@ import ErrorBoundary from '../ErrorBoundary';
 import CardList from '../components/CardList/CardList';
 import TestErrorButton from '../components/TestErrorButton/TestErrorButton';
 import Header from '../components/Header/Header';
-import { fetchCharacterById, fetchCharacters } from '../api/rickAndMortyApi';
+import { fetchCharacters } from '../api/rickAndMortyApi';
 import type { Character, Info } from '../types/types';
 import Pagination from '../components/Pagination/Pagination';
-import { useSearchParams } from 'react-router-dom';
-import Spinner from '../components/Spinner/Spinner';
-import CardDetails from '../components/Card/CardDetails';
+import { Outlet, useSearchParams } from 'react-router-dom';
 import useLocalStorage from '../hooks/useLocalStorage';
 
 const CLASSES = {
@@ -18,12 +16,6 @@ const CLASSES = {
 };
 
 const STORAGE_KEY = 'lastSearchQuery';
-
-interface DetailsState {
-  data: Character | null;
-  isLoading: boolean;
-  error: string | null;
-}
 
 export default function HomePage(): JSX.Element {
   const [lastSearchQuery, setLastSearchQuery] = useLocalStorage(STORAGE_KEY, '');
@@ -35,13 +27,6 @@ export default function HomePage(): JSX.Element {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
-  const detailsId = searchParams.get('details') ? Number(searchParams.get('details')) : null;
-
-  const [detailsState, setDetailsState] = useState<DetailsState>({
-    data: null,
-    isLoading: false,
-    error: null,
-  });
 
   const fetchData = useCallback(async (searchTerm: string, page: number = 1): Promise<void> => {
     setIsLoading(true);
@@ -106,32 +91,6 @@ export default function HomePage(): JSX.Element {
     setSearchQuery(query);
   };
 
-  const loadDetails = useCallback(async (id: number) => {
-    setDetailsState({ data: null, isLoading: true, error: null });
-
-    try {
-      const character = await fetchCharacterById(id);
-
-      setDetailsState({ data: character, isLoading: false, error: null });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load details';
-
-      setDetailsState({ data: null, isLoading: false, error: errorMessage });
-    }
-  }, []);
-
-  useEffect(() => {
-    const init = async () => {
-      if (detailsId) {
-        await loadDetails(detailsId);
-      } else {
-        setDetailsState({ data: null, isLoading: false, error: null });
-      }
-    };
-
-    init();
-  }, [detailsId, loadDetails]);
-
   const handleCardClick = (id: number) => {
     setSearchParams((prev) => {
       const params = new URLSearchParams(prev);
@@ -172,14 +131,7 @@ export default function HomePage(): JSX.Element {
               <TestErrorButton isLoading={isLoading} />
             </div>
             <div className={styles.rightColumn}>
-              {detailsState.isLoading && <Spinner />}
-              {detailsState.error && <div className={styles.error}>{detailsState.error}</div>}
-              {detailsState.data && !detailsState.isLoading && (
-                <CardDetails character={detailsState.data} onClose={closeDetails} />
-              )}
-              {!detailsState.data && !detailsState.isLoading && !detailsState.error && (
-                <div className={styles.noDetails}>Click on a character to see details</div>
-              )}
+              <Outlet />
             </div>
           </section>
         </ErrorBoundary>
