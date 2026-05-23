@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import * as api from '../api/rickAndMortyApi';
 import HomePage from '../pages/HomePage';
+import { ThemeProvider } from '../contexts/ThemeContext';
 
 vi.mock('../api/rickAndMortyApi');
 
@@ -28,9 +29,11 @@ describe('HomePage', () => {
 
   const renderHomePage = (initialEntries = ['/']) => {
     return render(
-      <MemoryRouter initialEntries={initialEntries}>
-        <HomePage />
-      </MemoryRouter>
+      <ThemeProvider>
+        <MemoryRouter initialEntries={initialEntries}>
+          <HomePage />
+        </MemoryRouter>
+      </ThemeProvider>
     );
   };
 

@@ -27,3 +27,16 @@
   background: var(--secondary-hover);
   box-shadow: var(--shadow);
 }
+
+.themeToggle {
+  font-size: 18px;
+  cursor: pointer;
+  background-color: transparent;
+  border-radius: 50%;
+  padding: 10px;
+  transition: all 0.2s ease-in;
+}
+
+.themeToggle:hover {
+  box-shadow: var(--shadow);
+}

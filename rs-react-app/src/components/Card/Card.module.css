@@ -28,10 +28,10 @@
 .cardItem__title {
   font-size: 23px;
   margin-bottom: 10px;
-  color: rgba(120, 5, 208);
+  color: var(--accent-primary);
 
   span {
-    color: #0a261c;
+    color: var(--text-h);
   }
 
   @media (max-width: 1024px) {
@@ -45,5 +45,5 @@
 
 .cardItem__description span {
   font-weight: 700;
-  color: #3f8486;
+  color: var(--label-muted);
 }

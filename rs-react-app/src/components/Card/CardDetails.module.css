@@ -1,5 +1,5 @@
 .details {
-  background: #fff;
+  background: var(--bg-surface);
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -10,8 +10,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px;
-  background: #f0f0f0;
-  border-bottom: 1px solid #ccc;
+  background: var(--bg-surface-header);
+  border-bottom: 1px solid var(--border);
 }
 
 .details__content {
@@ -29,7 +29,7 @@
 .details__title {
   text-align: center;
   margin-bottom: 18px;
-  color: rgba(120, 5, 208);
+  color: var(--accent-primary);
 }
 
 .details__closeBtn {
@@ -47,11 +47,10 @@
 
 .details__description span {
   font-weight: 700;
-  color: #3f8486;
+  color: var(--label-muted);
 }
 
 .noDetails {
-  color: #666;
   text-align: center;
   padding: 36px;
 }

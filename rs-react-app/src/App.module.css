@@ -47,10 +47,10 @@
 }
 
 .fallbackUi__button {
-  background: #4682b4;
+  background: var(--secondary-bg);
   color: var(--text-white);
 }
 
 .fallbackUi__button:hover {
-  background: #326d9e;
+  background: var(--secondary-hover);
 }

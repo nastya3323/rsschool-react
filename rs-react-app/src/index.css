@@ -21,6 +21,10 @@ button {
   --secondary-bg: #4682b4;
   --secondary-hover: #326d9e;
   --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --accent-primary: #7805d0;
+  --label-muted: #3f8486;
+  --bg-surface: #ffffff;
+  --bg-surface-header: #f0f0f0;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -36,6 +40,23 @@ button {
   @media (max-width: 1024px) {
     font-size: 16px;
   }
+}
+
+.dark {
+  --text: #d1d1d1;
+  --text-h: #f0f0f0;
+  --bg: #1a1a1a;
+  --border: #3a3a3a;
+  --accent: #bb86fc;
+  --accent-bg: rgba(187, 134, 252, 0.3);
+  --secondary-bg: #1e4a6e;
+  --secondary-hover: #0f3b58;
+  --shadow: rgba(0, 0, 0, 0.3) 0 10px 15px -3px, rgba(0, 0, 0, 0.2) 0 4px 6px -2px;
+
+  --accent-primary: #c77dff;
+  --label-muted: #8ac4c6;
+  --bg-surface: #2c2c2c;
+  --bg-surface-header: #1f1f1f;
 }
 
 #root {
@@ -79,6 +100,7 @@ h2 {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease-in;
+  color: var(--text-h);
 }
 
 .button:hover:enabled {
