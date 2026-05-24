@@ -1,4 +1,5 @@
 .cardItem {
+  position: relative;
   width: calc((100% - 20px) / 2);
   border: 1px solid var(--accent-bg);
   border-radius: 15px;
@@ -46,4 +47,11 @@
 .cardItem__description span {
   font-weight: 700;
   color: var(--label-muted);
+}
+
+.cardItem__checkbox {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  transform: scale(1.5);
 }

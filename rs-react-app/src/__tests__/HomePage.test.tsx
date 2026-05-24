@@ -4,6 +4,9 @@ import { MemoryRouter } from 'react-router-dom';
 import * as api from '../api/rickAndMortyApi';
 import HomePage from '../pages/HomePage';
 import { ThemeProvider } from '../contexts/ThemeContext';
+import { configureStore } from '@reduxjs/toolkit';
+import selectedReducer from '../store/selectedSlice';
+import { Provider } from 'react-redux';
 
 vi.mock('../api/rickAndMortyApi');
 
@@ -28,12 +31,19 @@ describe('HomePage', () => {
   });
 
   const renderHomePage = (initialEntries = ['/']) => {
+    const store = configureStore({
+      reducer: { selected: selectedReducer },
+      preloadedState: { selected: { ids: [] } },
+    });
+
     return render(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={initialEntries}>
-          <HomePage />
-        </MemoryRouter>
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider>
+          <MemoryRouter initialEntries={initialEntries}>
+            <HomePage />
+          </MemoryRouter>
+        </ThemeProvider>
+      </Provider>
     );
   };
 

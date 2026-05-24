@@ -3,6 +3,9 @@ import { type JSX } from 'react';
 import Card from '../Card/Card';
 import type { Character } from '../../types/types';
 import Spinner from '../Spinner/Spinner';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleSelect } from '../../store/selectedSlice';
+import type { RootState } from '../../store/store';
 
 interface CardListProps {
   results: Character[];
@@ -12,6 +15,16 @@ interface CardListProps {
 }
 
 export default function CardList({ results, error, isLoading, onCardClick }: CardListProps): JSX.Element {
+  const selectedIds = useSelector((state: RootState) => {
+    return state.selected.ids;
+  });
+
+  const dispatch = useDispatch();
+
+  const handleSelect = (id: number) => {
+    dispatch(toggleSelect(id));
+  };
+
   if (error) {
     return <div className={styles.errorMessage}>{error}</div>;
   }
@@ -24,7 +37,15 @@ export default function CardList({ results, error, isLoading, onCardClick }: Car
     <>
       <div className={styles.results__list} data-testid="card-list">
         {results.map((character) => {
-          return <Card key={character.id} character={character} onClick={() => onCardClick(character.id)} />;
+          return (
+            <Card
+              key={character.id}
+              character={character}
+              isSelected={selectedIds.includes(character.id)}
+              onOpenDetails={() => onCardClick(character.id)}
+              onSelect={handleSelect}
+            />
+          );
         })}
       </div>
     </>

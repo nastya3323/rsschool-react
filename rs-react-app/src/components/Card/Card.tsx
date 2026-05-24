@@ -4,17 +4,27 @@ import React, { type JSX } from 'react';
 
 interface CardProps {
   character: Character;
-  onClick: () => void;
+  isSelected: boolean;
+  onOpenDetails: () => void;
+  onSelect: (id: number) => void;
 }
 
-export default function Card({ character, onClick }: CardProps): JSX.Element {
-  const handleClick = (event: React.MouseEvent) => {
+export default function Card({ character, onOpenDetails, isSelected, onSelect }: CardProps): JSX.Element {
+  const handleCardClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    onClick();
+    onOpenDetails();
+  };
+
+  const handleCheckboxClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    onSelect(character.id);
   };
 
   return (
-    <div className={styles.cardItem} onClick={handleClick} data-testid="card">
+    <div className={styles.cardItem} onClick={handleCardClick} data-testid="card">
+      <div className={styles.cardItem__checkbox}>
+        <input type="checkbox" checked={isSelected} onClick={handleCheckboxClick} onChange={() => {}} />
+      </div>
       <h3 className={styles.cardItem__title}>
         <span>Name</span>: {character.name}
       </h3>
