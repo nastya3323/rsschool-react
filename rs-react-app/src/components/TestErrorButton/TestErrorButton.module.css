@@ -1,7 +1,7 @@
 .testErrorButton {
   margin-top: 50px;
   background: var(--secondary-bg);
-  color: var(--text-white);
+  color: var(--secondary-white);
   align-self: end;
 }
 
