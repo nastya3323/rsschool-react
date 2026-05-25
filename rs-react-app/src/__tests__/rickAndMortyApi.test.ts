@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Character, FetchCharactersResponse } from '../types/types';
-import { fetchCharacterById, fetchCharacters } from '../api/rickAndMortyApi';
+import { fetchCharacterById, fetchCharacters, fetchCharactersByIds } from '../api/rickAndMortyApi';
 
 const mockCharacter: Character = {
   id: 1,
@@ -78,6 +78,50 @@ describe('rickAndMortyApi', () => {
       mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
 
       await expect(fetchCharacterById(999)).rejects.toThrow('Failed to load character details');
+    });
+  });
+
+  describe('fetchCharactersByIds', () => {
+    it('should fetch multiple characters by ids', async () => {
+      const characters = [mockCharacter, { ...mockCharacter, id: 2, name: 'Summer' }];
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => characters,
+      });
+
+      const result = await fetchCharactersByIds([1, 2]);
+
+      expect(mockFetch).toHaveBeenCalledWith('https://rickandmortyapi.com/api/character/1,2');
+
+      expect(result).toEqual(characters);
+    });
+
+    it('should fetch single character and wrap in array', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockCharacter,
+      });
+
+      const result = await fetchCharactersByIds([1]);
+
+      expect(mockFetch).toHaveBeenCalledWith('https://rickandmortyapi.com/api/character/1');
+
+      expect(result).toEqual([mockCharacter]);
+    });
+
+    it('should return empty array when ids array is empty', async () => {
+      const result = await fetchCharactersByIds([]);
+
+      expect(mockFetch).not.toHaveBeenCalled();
+
+      expect(result).toEqual([]);
+    });
+
+    it('should throw error when response not ok', async () => {
+      mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+
+      await expect(fetchCharactersByIds([999])).rejects.toThrow('Failed to fetch selected characters');
     });
   });
 });

@@ -131,8 +131,8 @@ export default function HomePage(): JSX.Element {
               <Outlet />
             </div>
           </section>
+          <FloatingActionBar />
         </ErrorBoundary>
-        <FloatingActionBar />
       </main>
     </>
   );

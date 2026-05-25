@@ -3,8 +3,13 @@ import Button from '../Button/Button';
 import styles from './FloatingActionBar.module.css';
 import type { RootState } from '../../store/store';
 import { clearAll } from '../../store/selectedSlice';
+import { downloadSelectedCharacters } from '../../utils/csvExport';
+import { useState } from 'react';
+import { fetchCharactersByIds } from '../../api/rickAndMortyApi';
 
 export default function FloatingActionBar() {
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const selectedIds = useSelector((state: RootState) => {
     return state.selected.ids;
   });
@@ -20,6 +25,23 @@ export default function FloatingActionBar() {
     dispatch(clearAll());
   };
 
+  const handleDownload = async () => {
+    if (isDownloading) {
+      return;
+    }
+
+    setIsDownloading(true);
+
+    try {
+      const characters = await fetchCharactersByIds(selectedIds);
+      downloadSelectedCharacters(characters);
+    } catch {
+      return;
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className={styles.floatingBar}>
       <div className={styles.floatingBar__content}>
@@ -30,8 +52,8 @@ export default function FloatingActionBar() {
           <Button className={styles.floatingBar__button} onClick={handleClearAll}>
             Clear All
           </Button>
-          <Button className={styles.floatingBar__button} onClick={() => console.log('Download')}>
-            Download
+          <Button className={styles.floatingBar__button} onClick={handleDownload}>
+            {isDownloading ? 'Loading...' : 'Download'}
           </Button>
         </div>
       </div>

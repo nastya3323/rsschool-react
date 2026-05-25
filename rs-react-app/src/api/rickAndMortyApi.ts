@@ -37,4 +37,21 @@ async function fetchCharacterById(id: number): Promise<Character> {
   return data;
 }
 
-export { fetchCharacters, fetchCharacterById };
+async function fetchCharactersByIds(ids: number[]): Promise<Character[]> {
+  if (!ids.length) {
+    return [];
+  }
+
+  const url = `${BASE_URL}/${ids.join(',')}`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch selected characters');
+  }
+
+  const data = await response.json();
+  return Array.isArray(data) ? data : [data];
+}
+
+export { fetchCharacters, fetchCharacterById, fetchCharactersByIds };
