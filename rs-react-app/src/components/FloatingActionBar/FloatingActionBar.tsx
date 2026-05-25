@@ -9,6 +9,7 @@ import { fetchCharactersByIds } from '../../api/rickAndMortyApi';
 
 export default function FloatingActionBar() {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const selectedIds = useSelector((state: RootState) => {
     return state.selected.ids;
@@ -31,12 +32,13 @@ export default function FloatingActionBar() {
     }
 
     setIsDownloading(true);
+    setIsError(false);
 
     try {
       const characters = await fetchCharactersByIds(selectedIds);
       downloadSelectedCharacters(characters);
     } catch {
-      return;
+      setIsError(true);
     } finally {
       setIsDownloading(false);
     }
@@ -48,6 +50,11 @@ export default function FloatingActionBar() {
         <div className={styles.floatingBar__info}>
           Selected: {count} character{count !== 1 ? 's' : ''}
         </div>
+        {isError ? (
+          <p className={styles.floatingBar__error}>Could not download selected characters. Please try again.</p>
+        ) : (
+          ''
+        )}
         <div className={styles.floatingBar__actions}>
           <Button className={styles.floatingBar__button} onClick={handleClearAll}>
             Clear All

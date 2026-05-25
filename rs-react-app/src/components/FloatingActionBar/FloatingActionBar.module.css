@@ -38,3 +38,7 @@
   background: var(--accent-bg);
   color: var(--text-h);
 }
+
+.floatingBar__error {
+  color: #ff0000;
+}

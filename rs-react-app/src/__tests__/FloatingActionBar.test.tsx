@@ -111,4 +111,20 @@ describe('FloatingActionBar component', () => {
 
     expect(downloadButton).toHaveTextContent('Loading...');
   });
+
+  it('handles API error gracefully', async () => {
+    mockFetchCharactersByIds.mockRejectedValueOnce(new Error('Network error'));
+    renderWithStore([1]);
+
+    const downloadButton = screen.getByRole('button', { name: /Download/i });
+
+    await userEvent.click(downloadButton);
+
+    await waitFor(() => {
+      expect(downloadButton).toHaveTextContent('Download');
+    });
+
+    expect(mockDownloadSelectedCharacters).not.toHaveBeenCalled();
+    expect(screen.getByText(/Could not download selected characters/i)).toBeInTheDocument();
+  });
 });
