@@ -10,6 +10,7 @@ import type { Character, Info } from '../types/types';
 import Pagination from '../components/Pagination/Pagination';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import useLocalStorage from '../hooks/useLocalStorage';
+import FloatingActionBar from '../components/FloatingActionBar/FloatingActionBar';
 
 const STORAGE_KEY = 'lastSearchQuery';
 
@@ -131,6 +132,7 @@ export default function HomePage(): JSX.Element {
             </div>
           </section>
         </ErrorBoundary>
+        <FloatingActionBar />
       </main>
     </>
   );

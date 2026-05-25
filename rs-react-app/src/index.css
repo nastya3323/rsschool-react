@@ -24,6 +24,7 @@ button {
   --accent-primary: #7805d0;
   --label-muted: #3f8486;
   --bg-surface: #ffffff;
+  --bg-surface-rgba: rgba(255, 255, 255, 0.6);
   --bg-surface-header: #f0f0f0;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -56,6 +57,7 @@ button {
   --accent-primary: #c77dff;
   --label-muted: #8ac4c6;
   --bg-surface: #2c2c2c;
+  --bg-surface-rgba: rgba(44, 44, 44, 0.6);
   --bg-surface-header: #1f1f1f;
 }
 

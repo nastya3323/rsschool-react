@@ -1,0 +1,40 @@
+.floatingBar {
+  position: sticky;
+  margin-top: 15px;
+  bottom: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  z-index: 1000;
+  background: var(--bg-surface-rgba);
+  backdrop-filter: blur(15px);
+}
+
+.floatingBar__content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.floatingBar__info {
+  color: var(--text-h);
+}
+
+.floatingBar__actions {
+  display: flex;
+  gap: 15px;
+}
+
+.floatingBar__button {
+  background: var(--accent);
+  color: var(--text-white);
+  border-radius: 4px;
+}
+
+.floatingBar__button:hover {
+  background: var(--accent-bg);
+  color: var(--text-h);
+}

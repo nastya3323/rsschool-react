@@ -15,7 +15,7 @@ describe('Header theme toggle', () => {
     );
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('🌙');
-    
+
     await userEvent.click(button);
     expect(button).toHaveTextContent('☀️');
   });
