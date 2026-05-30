@@ -1,19 +1,17 @@
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../Button/Button';
 import styles from './FloatingActionBar.module.css';
-import type { RootState } from '../../store/store';
 import { clearAll } from '../../store/selectedSlice';
 import { downloadSelectedCharacters } from '../../utils/csvExport';
 import { useState } from 'react';
 import { fetchCharactersByIds } from '../../api/rickAndMortyApi';
+import { selectSelectedIds } from '../../store/selectedSelectors';
 
 export default function FloatingActionBar() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const selectedIds = useSelector((state: RootState) => {
-    return state.selected.ids;
-  });
+  const selectedIds = useSelector(selectSelectedIds);
 
   const dispatch = useDispatch();
   const count = selectedIds.length;

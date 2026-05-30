@@ -5,7 +5,7 @@ import type { Character } from '../../types/types';
 import Spinner from '../Spinner/Spinner';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleSelect } from '../../store/selectedSlice';
-import type { RootState } from '../../store/store';
+import { selectSelectedIds } from '../../store/selectedSelectors';
 
 interface CardListProps {
   results: Character[];
@@ -15,9 +15,7 @@ interface CardListProps {
 }
 
 export default function CardList({ results, error, isLoading, onCardClick }: CardListProps): JSX.Element {
-  const selectedIds = useSelector((state: RootState) => {
-    return state.selected.ids;
-  });
+  const selectedIds = useSelector(selectSelectedIds);
 
   const dispatch = useDispatch();
 
