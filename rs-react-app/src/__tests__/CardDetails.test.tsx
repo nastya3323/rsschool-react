@@ -7,7 +7,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('../api/rickAndMortyApi');
 
-const mockFetchCharacterById = api.fetchCharacterById as ReturnType<typeof vi.fn>;
+const mockGetCharacterById = vi.mocked(api.useGetCharacterByIdQuery);
 
 const mockCharacter: Character = {
   id: 1,
@@ -33,16 +33,26 @@ describe('CardDetails component', () => {
   };
 
   it('shows placeholder when no detailsId in URL', () => {
+    mockGetCharacterById.mockReturnValue({
+      data: undefined,
+      isFetching: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+
     renderCardDetails(['/']);
     expect(screen.getByText(/Click on a character to see details/i)).toBeInTheDocument();
   });
 
   it('fetches and displays character details when detailsId is present', async () => {
-    mockFetchCharacterById.mockResolvedValueOnce(mockCharacter);
+    mockGetCharacterById.mockReturnValue({
+      data: mockCharacter,
+      isFetching: false,
+      error: null,
+      refetch: vi.fn(),
+    });
 
     renderCardDetails(['/?details=1']);
-
-    expect(screen.getByTestId('spinner')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText('Character Details')).toBeInTheDocument();
@@ -62,8 +72,25 @@ describe('CardDetails component', () => {
     expect(img).toHaveAttribute('src', mockCharacter.image);
   });
 
+  it('shows spinner when loading', () => {
+    mockGetCharacterById.mockReturnValue({
+      data: undefined,
+      isFetching: true,
+      error: null,
+      refetch: vi.fn(),
+    });
+
+    renderCardDetails(['/?details=1']);
+    expect(screen.getByTestId('spinner')).toBeInTheDocument();
+  });
+
   it('shows error when fetch fails', async () => {
-    mockFetchCharacterById.mockRejectedValueOnce(new Error('Failed to load details'));
+    mockGetCharacterById.mockReturnValue({
+      data: undefined,
+      isFetching: false,
+      error: 'Failed to load details',
+      refetch: vi.fn(),
+    });
 
     renderCardDetails(['/?details=1']);
 
@@ -73,7 +100,12 @@ describe('CardDetails component', () => {
   });
 
   it('removes details from URL and shows placeholder when close button clicked', async () => {
-    mockFetchCharacterById.mockResolvedValueOnce(mockCharacter);
+    mockGetCharacterById.mockReturnValue({
+      data: mockCharacter,
+      isFetching: false,
+      error: null,
+      refetch: vi.fn(),
+    });
 
     renderCardDetails(['/?details=1']);
 

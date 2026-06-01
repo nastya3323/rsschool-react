@@ -1,57 +1,58 @@
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { Character, FetchCharactersResponse } from '../types/types';
 
 const BASE_URL = 'https://rickandmortyapi.com/api/character';
 
-async function fetchCharacters(searchTerm: string = '', page: number = 1): Promise<FetchCharactersResponse> {
-  const url = `${BASE_URL}?name=${searchTerm}&page=${page}`;
+const CACHE_TTL_SECONDS = Number(import.meta.env.API_RTK_CACHE_TTL_SECONDS) || 180;
 
-  const response = await fetch(url);
+export const rickAndMortyApi = createApi({
+  reducerPath: 'rickAndMortyApi',
+  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  keepUnusedDataFor: CACHE_TTL_SECONDS,
+  tagTypes: ['Characters', 'Character'],
+  endpoints: (builder) => ({
+    getCharacters: builder.query<FetchCharactersResponse, { searchTerm: string; page: number }>({
+      query: ({ searchTerm = '', page = 1 }) => {
+        const params = new URLSearchParams();
 
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('No characters found');
-    }
-    throw new Error(`API error (${response.status})`);
-  }
+        if (searchTerm) {
+          params.append('name', searchTerm);
+        }
 
-  const data = await response.json();
+        params.append('page', String(page));
 
-  if (data.results.length === 0) {
-    throw new Error('No characters found');
-  }
+        return `?${params.toString()}`;
+      },
 
-  return { results: data.results, info: data.info };
-}
+      providesTags: (result, error, { searchTerm }) => {
+        return searchTerm ? [{ type: 'Characters', id: searchTerm }] : ['Characters'];
+      },
 
-async function fetchCharacterById(id: number): Promise<Character> {
-  const url = `${BASE_URL}/${id}`;
+      transformErrorResponse: (response) => {
+        if (response.status === 404) {
+          return 'No characters found';
+        }
 
-  const response = await fetch(url);
+        return `API error (${response.status})`;
+      },
+    }),
 
-  if (!response.ok) {
-    throw new Error('Failed to load character details');
-  }
+    getCharacterById: builder.query<Character, number>({
+      query: (id) => `${id}`,
+      providesTags: (result, error, id) => [{ type: 'Character', id }],
+    }),
 
-  const data = await response.json();
+    getCharactersByIds: builder.query<Character[], number[]>({
+      query: (ids) => ids.join(','),
+      transformResponse: (response: Character | Character[]) => {
+        return Array.isArray(response) ? response : [response];
+      },
 
-  return data;
-}
+      providesTags: (result) => {
+        return result ? result.map(({ id }) => ({ type: 'Character', id })) : ['Character'];
+      },
+    }),
+  }),
+});
 
-async function fetchCharactersByIds(ids: number[]): Promise<Character[]> {
-  if (!ids.length) {
-    return [];
-  }
-
-  const url = `${BASE_URL}/${ids.join(',')}`;
-
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch selected characters');
-  }
-
-  const data = await response.json();
-  return Array.isArray(data) ? data : [data];
-}
-
-export { fetchCharacters, fetchCharacterById, fetchCharactersByIds };
+export const { useGetCharactersQuery, useGetCharacterByIdQuery, useLazyGetCharactersByIdsQuery } = rickAndMortyApi;

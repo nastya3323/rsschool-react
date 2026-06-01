@@ -1,48 +1,41 @@
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../Button/Button';
 import styles from './FloatingActionBar.module.css';
-import type { RootState } from '../../store/store';
 import { clearAll } from '../../store/selectedSlice';
 import { downloadSelectedCharacters } from '../../utils/csvExport';
-import { useState } from 'react';
-import { fetchCharactersByIds } from '../../api/rickAndMortyApi';
+import { selectSelectedIds } from '../../store/selectedSelectors';
+import { useLazyGetCharactersByIdsQuery } from '../../api/rickAndMortyApi';
+import { useEffect } from 'react';
 
 export default function FloatingActionBar() {
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [isError, setIsError] = useState(false);
-
-  const selectedIds = useSelector((state: RootState) => {
-    return state.selected.ids;
-  });
+  const selectedIds = useSelector(selectSelectedIds);
 
   const dispatch = useDispatch();
   const count = selectedIds.length;
 
-  if (!count) {
-    return null;
-  }
+  const [trigger, { data: characters, error, isFetching }] = useLazyGetCharactersByIdsQuery();
 
   const handleClearAll = () => {
     dispatch(clearAll());
   };
 
   const handleDownload = async () => {
-    if (isDownloading) {
+    if (!count) {
       return;
     }
 
-    setIsDownloading(true);
-    setIsError(false);
-
-    try {
-      const characters = await fetchCharactersByIds(selectedIds);
-      downloadSelectedCharacters(characters);
-    } catch {
-      setIsError(true);
-    } finally {
-      setIsDownloading(false);
-    }
+    trigger(selectedIds);
   };
+
+  useEffect(() => {
+    if (characters) {
+      downloadSelectedCharacters(characters);
+    }
+  }, [characters]);
+
+  if (!count) {
+    return null;
+  }
 
   return (
     <div className={styles.floatingBar}>
@@ -50,7 +43,7 @@ export default function FloatingActionBar() {
         <div className={styles.floatingBar__info}>
           Selected: {count} character{count !== 1 ? 's' : ''}
         </div>
-        {isError ? (
+        {error ? (
           <p className={styles.floatingBar__error}>Could not download selected characters. Please try again.</p>
         ) : (
           ''
@@ -59,8 +52,8 @@ export default function FloatingActionBar() {
           <Button className={styles.floatingBar__button} onClick={handleClearAll}>
             Clear All
           </Button>
-          <Button className={styles.floatingBar__button} onClick={handleDownload}>
-            {isDownloading ? 'Loading...' : 'Download'}
+          <Button className={styles.floatingBar__button} onClick={handleDownload} disabled={isFetching}>
+            {isFetching ? 'Loading...' : 'Download'}
           </Button>
         </div>
       </div>

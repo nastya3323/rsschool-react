@@ -1,51 +1,21 @@
-import { useCallback, useEffect, useState } from 'react';
-import type { Character } from '../../types/types';
 import Button from '../Button/Button';
 import styles from './CardDetails.module.css';
-import { fetchCharacterById } from '../../api/rickAndMortyApi';
 import { useSearchParams } from 'react-router-dom';
 import Spinner from '../Spinner/Spinner';
+import { useGetCharacterByIdQuery } from '../../api/rickAndMortyApi';
 
 export default function CardDetails() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const detailsId = searchParams.get('details') ? Number(searchParams.get('details')) : null;
 
-  const [character, setCharacter] = useState<Character | null>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadDetails = useCallback(async (id: number) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const character = await fetchCharacterById(id);
-
-      setCharacter(character);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load details';
-
-      setCharacter(null);
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const init = async () => {
-      if (detailsId) {
-        await loadDetails(detailsId);
-      } else {
-        setCharacter(null);
-        setIsLoading(false);
-        setError(null);
-      }
-    };
-
-    init();
-  }, [detailsId, loadDetails]);
+  const {
+    data: character,
+    error,
+    isFetching,
+  } = useGetCharacterByIdQuery(detailsId!, {
+    skip: !detailsId,
+  });
 
   const closeDetails = () => {
     setSearchParams((prev) => {
@@ -55,16 +25,17 @@ export default function CardDetails() {
     });
   };
 
-  if (isLoading) {
+  if (!detailsId) {
+    return <div className={styles.noDetails}>Click on a character to see details</div>;
+  }
+
+  if (isFetching) {
     return <Spinner />;
   }
 
   if (error) {
-    return <div className={styles.error}>{error}</div>;
-  }
-
-  if (!character && !isLoading && !error) {
-    return <div className={styles.noDetails}>Click on a character to see details</div>;
+    const errorMessage = typeof error === 'string' ? error : 'Failed to load details';
+    return <div className={styles.error}>{errorMessage}</div>;
   }
 
   return (

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Character, FetchCharactersResponse } from '../types/types';
-import { fetchCharacterById, fetchCharacters, fetchCharactersByIds } from '../api/rickAndMortyApi';
+import { rickAndMortyApi } from '../api/rickAndMortyApi';
+import { configureStore } from '@reduxjs/toolkit';
 
 const mockCharacter: Character = {
   id: 1,
@@ -20,108 +20,202 @@ const mockResponse: FetchCharactersResponse = {
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
+const createFetchResponse = (data: unknown, ok = true, status = 200) => {
+  const response = {
+    ok,
+    status,
+    headers: new Headers(),
+    json: async () => data,
+    text: async () => JSON.stringify(data),
+    clone() {
+      return createFetchResponse(data, ok, status);
+    },
+  };
+  return response;
+};
+
 describe('rickAndMortyApi', () => {
+  let store: ReturnType<typeof createTestStore>;
+
+  const createTestStore = () =>
+    configureStore({
+      reducer: {
+        [rickAndMortyApi.reducerPath]: rickAndMortyApi.reducer,
+      },
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(rickAndMortyApi.middleware),
+    });
+
   beforeEach(() => {
     mockFetch.mockReset();
+    store = createTestStore();
   });
 
-  describe('fetchCharacters', () => {
+  describe('getCharacters', () => {
     it('should fetch characters with search term and page', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ info: mockResponse.info, results: mockResponse.results }),
-      });
+      mockFetch.mockResolvedValueOnce(createFetchResponse(mockResponse));
 
-      const result = await fetchCharacters('rick', 1);
+      const result = await store
+        .dispatch(rickAndMortyApi.endpoints.getCharacters.initiate({ searchTerm: 'rick', page: 1 }))
+        .unwrap();
 
-      expect(mockFetch).toHaveBeenCalledWith('https://rickandmortyapi.com/api/character?name=rick&page=1');
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const arg = mockFetch.mock.calls[0][0];
+      const url = arg instanceof Request ? arg.url : arg;
+      expect(url).toBe('https://rickandmortyapi.com/api/character?name=rick&page=1');
 
       expect(result).toEqual(mockResponse);
     });
 
     it('should throw "No characters found" on 404', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 404, json: async () => ({}) });
+      mockFetch.mockResolvedValueOnce(createFetchResponse({}, false, 404));
 
-      await expect(fetchCharacters('unknown', 1)).rejects.toThrow('No characters found');
+      const initiation = store.dispatch(
+        rickAndMortyApi.endpoints.getCharacters.initiate({ searchTerm: 'unknown', page: 1 })
+      );
+
+      await expect(initiation.unwrap()).rejects.toThrow('No characters found');
     });
 
     it('should throw API error on other non-ok status', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({}) });
+      mockFetch.mockResolvedValueOnce(createFetchResponse({}, false, 500));
 
-      await expect(fetchCharacters('rick', 1)).rejects.toThrow('API error (500)');
+      const initiation = store.dispatch(
+        rickAndMortyApi.endpoints.getCharacters.initiate({ searchTerm: 'rick', page: 1 })
+      );
+
+      await expect(initiation.unwrap()).rejects.toThrow('API error (500)');
     });
 
-    it('should throw when results array is empty', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ info: {}, results: [] }),
-      });
-      await expect(fetchCharacters('nonexistent', 1)).rejects.toThrow('No characters found');
+    it('should return cached data for the same searchTerm and page', async () => {
+      mockFetch.mockResolvedValueOnce(createFetchResponse(mockResponse));
+
+      const result1 = await store
+        .dispatch(rickAndMortyApi.endpoints.getCharacters.initiate({ searchTerm: 'rick', page: 1 }))
+        .unwrap();
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result1.results).toEqual([mockCharacter]);
+
+      const result2 = await store
+        .dispatch(rickAndMortyApi.endpoints.getCharacters.initiate({ searchTerm: 'rick', page: 1 }))
+        .unwrap();
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result2.results).toEqual([mockCharacter]);
+    });
+
+    it('should make new request for different arguments', async () => {
+      mockFetch.mockResolvedValueOnce(createFetchResponse(mockResponse));
+      mockFetch.mockResolvedValueOnce(createFetchResponse({ info: mockResponse.info, results: [] }));
+
+      await store.dispatch(rickAndMortyApi.endpoints.getCharacters.initiate({ searchTerm: 'rick', page: 1 })).unwrap();
+
+      await store.dispatch(rickAndMortyApi.endpoints.getCharacters.initiate({ searchTerm: 'rick', page: 2 })).unwrap();
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
     });
   });
 
-  describe('fetchCharacterById', () => {
+  describe('getCharacterById', () => {
     it('should fetch character by id', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockCharacter,
-      });
+      mockFetch.mockResolvedValueOnce(createFetchResponse(mockCharacter));
 
-      const result = await fetchCharacterById(1);
+      const result = await store.dispatch(rickAndMortyApi.endpoints.getCharacterById.initiate(1)).unwrap();
 
-      expect(mockFetch).toHaveBeenCalledWith('https://rickandmortyapi.com/api/character/1');
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const arg = mockFetch.mock.calls[0][0];
+      const url = arg instanceof Request ? arg.url : arg;
+      expect(url).toBe('https://rickandmortyapi.com/api/character/1');
 
       expect(result).toEqual(mockCharacter);
     });
 
-    it('should throw error when response not ok', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+    it('should throw error on 404', async () => {
+      mockFetch.mockResolvedValueOnce(createFetchResponse(null, false, 404));
 
-      await expect(fetchCharacterById(999)).rejects.toThrow('Failed to load character details');
+      const initiation = store.dispatch(rickAndMortyApi.endpoints.getCharacterById.initiate(999));
+
+      await expect(initiation.unwrap()).rejects.toMatchObject({
+        status: 404,
+        data: null,
+      });
+    });
+
+    it('should throw error when response not ok', async () => {
+      mockFetch.mockResolvedValueOnce(createFetchResponse({ error: 'server error' }, false, 500));
+
+      const initiation = store.dispatch(rickAndMortyApi.endpoints.getCharacterById.initiate(1));
+
+      await expect(initiation.unwrap()).rejects.toMatchObject({
+        status: 500,
+        data: { error: 'server error' },
+      });
+    });
+
+    it('should return cached data without second fetch for same arguments', async () => {
+      mockFetch.mockResolvedValueOnce(createFetchResponse(mockCharacter));
+
+      const result1 = await store.dispatch(rickAndMortyApi.endpoints.getCharacterById.initiate(1)).unwrap();
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result1).toEqual(mockCharacter);
+
+      const result2 = await store.dispatch(rickAndMortyApi.endpoints.getCharacterById.initiate(1)).unwrap();
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result2).toEqual(mockCharacter);
     });
   });
 
-  describe('fetchCharactersByIds', () => {
+  describe('getCharactersByIds', () => {
     it('should fetch multiple characters by ids', async () => {
       const characters = [mockCharacter, { ...mockCharacter, id: 2, name: 'Summer' }];
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => characters,
-      });
+      mockFetch.mockResolvedValueOnce(createFetchResponse(characters));
 
-      const result = await fetchCharactersByIds([1, 2]);
+      const result = await store.dispatch(rickAndMortyApi.endpoints.getCharactersByIds.initiate([1, 2])).unwrap();
 
-      expect(mockFetch).toHaveBeenCalledWith('https://rickandmortyapi.com/api/character/1,2');
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const arg = mockFetch.mock.calls[0][0];
+      const url = arg instanceof Request ? arg.url : arg;
+      expect(url).toBe('https://rickandmortyapi.com/api/character/1,2');
 
       expect(result).toEqual(characters);
     });
 
     it('should fetch single character and wrap in array', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockCharacter,
-      });
+      mockFetch.mockResolvedValueOnce(createFetchResponse(mockCharacter));
 
-      const result = await fetchCharactersByIds([1]);
+      const result = await store.dispatch(rickAndMortyApi.endpoints.getCharactersByIds.initiate([1])).unwrap();
 
-      expect(mockFetch).toHaveBeenCalledWith('https://rickandmortyapi.com/api/character/1');
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const arg = mockFetch.mock.calls[0][0];
+      const url = arg instanceof Request ? arg.url : arg;
+      expect(url).toBe('https://rickandmortyapi.com/api/character/1');
 
       expect(result).toEqual([mockCharacter]);
     });
 
-    it('should return empty array when ids array is empty', async () => {
-      const result = await fetchCharactersByIds([]);
+    it('should throw error on 404', async () => {
+      mockFetch.mockResolvedValueOnce(createFetchResponse(null, false, 404));
 
-      expect(mockFetch).not.toHaveBeenCalled();
+      const initiation = store.dispatch(rickAndMortyApi.endpoints.getCharactersByIds.initiate([999]));
 
-      expect(result).toEqual([]);
+      await expect(initiation.unwrap()).rejects.toMatchObject({
+        status: 404,
+        data: null,
+      });
     });
 
     it('should throw error when response not ok', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
+      mockFetch.mockResolvedValueOnce(createFetchResponse({ error: 'server error' }, false, 500));
 
-      await expect(fetchCharactersByIds([999])).rejects.toThrow('Failed to fetch selected characters');
+      const initiation = store.dispatch(rickAndMortyApi.endpoints.getCharacterById.initiate(1));
+
+      await expect(initiation.unwrap()).rejects.toMatchObject({
+        status: 500,
+        data: { error: 'server error' },
+      });
     });
   });
 });

@@ -8,9 +8,19 @@ import { configureStore } from '@reduxjs/toolkit';
 import selectedReducer from '../store/selectedSlice';
 import { Provider } from 'react-redux';
 
-vi.mock('../api/rickAndMortyApi');
+vi.mock('../components/FloatingActionBar/FloatingActionBar', () => ({
+  default: () => null,
+}));
 
-const mockFetchCharacters = api.fetchCharacters as ReturnType<typeof vi.fn>;
+vi.mock('../components/Card/CardDetails', () => ({
+  default: () => null,
+}));
+
+vi.mock('../api/rickAndMortyApi', () => ({
+  useGetCharactersQuery: vi.fn(),
+}));
+
+const mockUseGetCharactersQuery = vi.mocked(api.useGetCharactersQuery);
 
 const mockCharacter = {
   id: 1,
@@ -28,11 +38,21 @@ describe('HomePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+
+    mockUseGetCharactersQuery.mockReturnValue({
+      data: undefined,
+      isFetching: false,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
   });
 
   const renderHomePage = (initialEntries = ['/']) => {
     const store = configureStore({
-      reducer: { selected: selectedReducer },
+      reducer: {
+        selected: selectedReducer,
+      },
       preloadedState: { selected: { ids: [] } },
     });
 
@@ -48,7 +68,13 @@ describe('HomePage', () => {
   };
 
   it('fetches and displays characters on mount', async () => {
-    mockFetchCharacters.mockResolvedValueOnce({ results: [mockCharacter], info: mockInfo });
+    mockUseGetCharactersQuery.mockReturnValue({
+      data: { results: [mockCharacter], info: mockInfo },
+      isFetching: false,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
 
     renderHomePage();
     await waitFor(() => {
@@ -58,7 +84,13 @@ describe('HomePage', () => {
   });
 
   it('shows error when API fails', async () => {
-    mockFetchCharacters.mockRejectedValueOnce(new Error('API error'));
+    mockUseGetCharactersQuery.mockReturnValue({
+      data: undefined,
+      isFetching: false,
+      isLoading: false,
+      error: 'API error',
+      refetch: vi.fn(),
+    });
 
     renderHomePage();
     await waitFor(() => {
@@ -67,11 +99,12 @@ describe('HomePage', () => {
   });
 
   it('performs search when submitting search bar', async () => {
-    mockFetchCharacters.mockResolvedValueOnce({ results: [mockCharacter], info: mockInfo });
-
-    mockFetchCharacters.mockResolvedValueOnce({
-      results: [{ ...mockCharacter, id: 2, name: 'Summer' }],
-      info: mockInfo,
+    mockUseGetCharactersQuery.mockReturnValue({
+      data: { results: [mockCharacter], info: mockInfo },
+      isFetching: false,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
     });
 
     renderHomePage();
@@ -82,10 +115,19 @@ describe('HomePage', () => {
 
     await userEvent.clear(searchInput);
     await userEvent.type(searchInput, 'Summer');
+
+    mockUseGetCharactersQuery.mockReturnValue({
+      data: { results: [{ ...mockCharacter, id: 2, name: 'Summer' }], info: mockInfo },
+      isFetching: false,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+
     await userEvent.click(searchButton);
 
     await waitFor(() => {
-      expect(mockFetchCharacters).toHaveBeenLastCalledWith('Summer', 1);
+      expect(mockUseGetCharactersQuery).toHaveBeenLastCalledWith({ searchTerm: 'Summer', page: 1 });
     });
 
     await waitFor(() => {
@@ -105,20 +147,34 @@ describe('HomePage', () => {
       prev: null,
     };
 
-    mockFetchCharacters.mockResolvedValueOnce({ results: [mockCharacter], info: mockInfoWithNext });
-
-    mockFetchCharacters.mockResolvedValueOnce({
-      results: [{ ...mockCharacter, id: 2, name: 'Summer' }],
-      info: { ...mockInfoWithNext, next: null, prev: '?page=1' },
+    mockUseGetCharactersQuery.mockReturnValue({
+      data: { results: [mockCharacter], info: mockInfoWithNext },
+      isFetching: false,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
     });
 
     renderHomePage();
     await waitFor(() => expect(screen.getByText(/Rick Sanchez/i)).toBeInTheDocument());
 
     const nextButton = screen.getByRole('button', { name: /next/i });
+
+    mockUseGetCharactersQuery.mockReturnValue({
+      data: {
+        results: [{ ...mockCharacter, id: 2, name: 'Summer' }],
+        info: { ...mockInfoWithNext, next: null, prev: '?page=1' },
+      },
+      isFetching: false,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+
     await userEvent.click(nextButton);
 
-    expect(mockFetchCharacters).toHaveBeenLastCalledWith('', 2);
+    expect(mockUseGetCharactersQuery).toHaveBeenLastCalledWith({ searchTerm: '', page: 2 });
+
     await waitFor(() => expect(screen.getByText(/Summer/i)).toBeInTheDocument());
   });
 });
