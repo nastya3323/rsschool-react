@@ -14,11 +14,7 @@
   }
 
   @media (max-width: 850px) {
-    max-width: calc((100% - 40px) / 2);
-  }
-
-  @media (max-width: 640px) {
-    min-width: 100%;
+    width: 100%;
   }
 }
 
@@ -27,16 +23,12 @@
 }
 
 .cardItem__title {
-  font-size: 23px;
+  font-size: 20px;
   margin-bottom: 10px;
   color: var(--accent-primary);
 
   span {
     color: var(--text-h);
-  }
-
-  @media (max-width: 1024px) {
-    font-size: 20px;
   }
 }
 

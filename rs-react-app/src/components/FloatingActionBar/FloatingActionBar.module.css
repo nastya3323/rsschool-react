@@ -34,7 +34,7 @@
   border-radius: 4px;
 }
 
-.floatingBar__button:hover {
+.floatingBar__button:hover:enabled {
   background: var(--accent-bg);
   color: var(--text-h);
 }
