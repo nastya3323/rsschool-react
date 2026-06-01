@@ -4,20 +4,48 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import selectedReducer, { clearAll } from '../store/selectedSlice';
 import FloatingActionBar from '../components/FloatingActionBar/FloatingActionBar';
-import * as api from '../api/rickAndMortyApi';
+import { rickAndMortyApi } from '../api/rickAndMortyApi';
 import * as csvExport from '../utils/csvExport';
 
-vi.mock('../api/rickAndMortyApi');
-vi.mock('../utils/csvExport');
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
-const mockFetchCharactersByIds = api.fetchCharactersByIds as ReturnType<typeof vi.fn>;
+vi.mock('../utils/csvExport', () => ({
+  downloadSelectedCharacters: vi.fn(),
+}));
+
 const mockDownloadSelectedCharacters = csvExport.downloadSelectedCharacters as ReturnType<typeof vi.fn>;
 
+const createFetchResponse = (data: unknown, ok = true, status = 200) => {
+  const response = {
+    ok,
+    status,
+    headers: new Headers(),
+    json: async () => data,
+    text: async () => JSON.stringify(data),
+    clone() {
+      return createFetchResponse(data, ok, status);
+    },
+  };
+  return response;
+};
+
 describe('FloatingActionBar component', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFetch.mockReset();
+  });
+
   const renderWithStore = (selectedIds: number[]) => {
     const store = configureStore({
-      reducer: { selected: selectedReducer },
-      preloadedState: { selected: { ids: selectedIds } },
+      reducer: {
+        selected: selectedReducer,
+        [rickAndMortyApi.reducerPath]: rickAndMortyApi.reducer,
+      },
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(rickAndMortyApi.middleware),
+      preloadedState: {
+        selected: { ids: selectedIds },
+      },
     });
 
     return render(
@@ -26,10 +54,6 @@ describe('FloatingActionBar component', () => {
       </Provider>
     );
   };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
 
   it('does not render when no items selected', () => {
     renderWithStore([]);
@@ -48,8 +72,14 @@ describe('FloatingActionBar component', () => {
 
   it('calls dispatch clearAll when "Clear all" clicked', async () => {
     const store = configureStore({
-      reducer: { selected: selectedReducer },
-      preloadedState: { selected: { ids: [1, 2] } },
+      reducer: {
+        selected: selectedReducer,
+        [rickAndMortyApi.reducerPath]: rickAndMortyApi.reducer,
+      },
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(rickAndMortyApi.middleware),
+      preloadedState: {
+        selected: { ids: [1, 2] },
+      },
     });
 
     const dispatchSpy = vi.spyOn(store, 'dispatch');
@@ -87,8 +117,8 @@ describe('FloatingActionBar component', () => {
         image: 'url',
       },
     ];
-    mockFetchCharactersByIds.mockResolvedValueOnce(mockCharacters);
-    mockDownloadSelectedCharacters.mockImplementationOnce(() => {});
+
+    mockFetch.mockResolvedValueOnce(createFetchResponse(mockCharacters));
 
     renderWithStore(selectedIds);
 
@@ -96,13 +126,18 @@ describe('FloatingActionBar component', () => {
     await userEvent.click(downloadButton);
 
     await waitFor(() => {
-      expect(mockFetchCharactersByIds).toHaveBeenCalledWith(selectedIds);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const arg = mockFetch.mock.calls[0][0];
+      const url = arg instanceof Request ? arg.url : arg;
+      expect(url).toBe('https://rickandmortyapi.com/api/character/1,2');
+
       expect(mockDownloadSelectedCharacters).toHaveBeenCalledWith(mockCharacters);
     });
   });
 
   it('shows loading state on button while downloading', async () => {
-    mockFetchCharactersByIds.mockImplementationOnce(() => new Promise(() => {}));
+    mockFetch.mockImplementationOnce(() => new Promise(() => {}));
+
     renderWithStore([1]);
 
     const downloadButton = screen.getByRole('button', { name: /Download/i });
@@ -113,7 +148,8 @@ describe('FloatingActionBar component', () => {
   });
 
   it('handles API error gracefully', async () => {
-    mockFetchCharactersByIds.mockRejectedValueOnce(new Error('Network error'));
+    mockFetch.mockResolvedValueOnce(createFetchResponse({}, false, 404));
+
     renderWithStore([1]);
 
     const downloadButton = screen.getByRole('button', { name: /Download/i });
