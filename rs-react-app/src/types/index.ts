@@ -9,7 +9,7 @@ export interface Submission {
   country: string;
   imageBase64: string;
   submittedAt: number;
-  highlighted: boolean; 
+  highlighted: boolean;
 }
 
 export type FormData = Omit<Submission, 'id' | 'submittedAt' | 'highlighted'>;
@@ -17,4 +17,16 @@ export type FormData = Omit<Submission, 'id' | 'submittedAt' | 'highlighted'>;
 export interface Country {
   code: string;
   name: string;
+}
+
+export interface FormValues {
+  name: string;
+  age: number;
+  email: string;
+  gender: string;
+  terms: boolean;
+  image: File;
+  password: string;
+  confirmPassword: string;
+  country: string;
 }
