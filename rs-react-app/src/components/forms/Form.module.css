@@ -1,0 +1,56 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.field input,
+.field select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.preview {
+  max-width: 100px;
+  max-height: 100px;
+  margin-top: 5px;
+}
+
+.strength {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+}
+
+.strength li {
+  color: #2e7d32;
+}
+
+.submitButton {
+  margin-top: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.submitButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

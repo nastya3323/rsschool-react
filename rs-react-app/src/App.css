@@ -1,0 +1,103 @@
+.page {
+  padding: 20px;
+}
+
+.buttons {
+  margin-bottom: 20px;
+}
+
+.buttons button {
+  margin-right: 10px;
+  padding: 10px 16px;
+  font-size: 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--accent);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.buttons button:hover {
+  background-color: var(--accent-hover);
+  color: var(--text-h);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.field input {
+  background-color: #dadbdc;
+}
+
+.field input,
+.field select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.gender-legend {
+  padding-bottom: 7px;
+  padding-right: 5px;
+  padding-left: 2px;
+}
+
+.gender-option {
+  padding-left: 5px;
+}
+
+.gender-option input {
+  margin-right: 5px;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.preview {
+  max-width: 100px;
+  max-height: 100px;
+  margin-top: 5px;
+}
+
+.strength {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+}
+
+.strength li {
+  color: #2e7d32;
+}
+
+.submitButton {
+  border: none;
+  margin-top: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.submitButton:disabled {
+  background-color: var(--disabled);
+  cursor: not-allowed;
+}
+.submitButton:hover:enabled {
+  background-color: #ccc;
+}
