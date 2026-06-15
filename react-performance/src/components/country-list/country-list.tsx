@@ -1,6 +1,7 @@
 import type { Country } from '../../types';
 import { CountryCard } from '../country-card/country-card';
 import { getPopulationForYear, createYearDataMap } from '../../utils/data-transformers';
+import { Virtuoso } from 'react-virtuoso';
 
 import styles from './country-list.module.css';
 
@@ -42,14 +43,17 @@ export const CountryList = ({
 
   return (
     <div className={styles.countryList}>
-      {filteredCountries.map((country, index) => (
-        <CountryCard
-          key={index}
-          country={country}
-          selectedYear={selectedYear}
-          selectedColumns={selectedColumns}
-        />
-      ))}
+      <Virtuoso
+        style={{ height: '100vh' }}
+        totalCount={filteredCountries.length}
+        itemContent={(index) => (
+          <CountryCard
+            country={filteredCountries[index]}
+            selectedYear={selectedYear}
+            selectedColumns={selectedColumns}
+          />
+        )}
+      />
     </div>
   );
 };
